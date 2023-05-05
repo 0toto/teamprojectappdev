@@ -48,6 +48,7 @@ class _HomeMenu extends State<HomeMenu> {
         ),
 
         // start of the app
+        //let me die please
 
         backgroundColor: Colors.blue.shade100,
         body: Center(
@@ -60,7 +61,7 @@ class _HomeMenu extends State<HomeMenu> {
                   children: [
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('LEARNMATE',
+                      child: Text('LEARNMATEs',
                         style: TextStyle(
                             fontSize: 27,
                             color: Colors.white
