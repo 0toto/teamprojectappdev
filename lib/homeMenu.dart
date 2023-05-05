@@ -61,7 +61,7 @@ class _HomeMenu extends State<HomeMenu> {
                   children: [
                     const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('LEARNMATEs',
+                      child: Text('LEARNMATE',
                         style: TextStyle(
                             fontSize: 27,
                             color: Colors.white
