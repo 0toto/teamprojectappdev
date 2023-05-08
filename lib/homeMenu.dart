@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import './settingPage.dart';
 
+void main(){
+  runApp(HomeMenu());
+}
+
 class HomeMenu extends StatefulWidget {
   const HomeMenu({Key? key}) : super(key: key);
 
@@ -40,8 +44,8 @@ class _HomeMenu extends State<HomeMenu> {
                 fontSize: 15,
                 items: [
                   FloatingNavbarItem(icon: Icons.home, title: 'Home'),
+                  FloatingNavbarItem(icon: Icons.menu_book, title: 'Quiz'),
                   FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
-                  FloatingNavbarItem(icon: Icons.settings, title: 'Setting'),
                 ],
               ),
             )
