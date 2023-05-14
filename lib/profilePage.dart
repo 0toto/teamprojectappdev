@@ -65,12 +65,17 @@ class _profileState extends State<profile> {
                       height: 150,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(45)),
-                          image: DecorationImage(
-                              image: NetworkImage(
-                                'https://i.pinimg.com/564x/8f/54/e8/8f54e830cd9e28ad73d51cf5f6901c80.jpg',
-                              ),
-                              fit: BoxFit.fill)),
+                          // image: DecorationImage(
+                          //     image: NetworkImage(
+                          //       'https://i.pinimg.com/564x/8f/54/e8/8f54e830cd9e28ad73d51cf5f6901c80.jpg',
+                          //     ),
+                          //     fit: BoxFit.fill)
+
+                        color: Colors.red
+                      ),
                   ),
+
+
                   
                   Container(
                     height: 50,
@@ -79,6 +84,16 @@ class _profileState extends State<profile> {
                     style: TextStyle(
                       fontSize: 20
                     ),),
+                  ),
+
+                  Container(
+                    height: 60,
+                    width: 350,
+                    alignment: Alignment.bottomRight,
+                    child: IconButton(
+                      icon: Icon(Icons.settings) ,
+                      onPressed: (){},
+                    ),
                   ),
 
                   Container(
@@ -179,12 +194,6 @@ class _profileState extends State<profile> {
               Divider(
                 thickness: 2,
               ),
-
-
-
-
-
-
 
 
             ],
