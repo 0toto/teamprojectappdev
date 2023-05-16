@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../widgets/round-button.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -23,6 +24,7 @@ class _CountdownPageState extends State<CountdownPage>
   late AnimationController controller;
 
   bool isPlaying = false;
+  int _currentIndex = 0;
 
   String get countText {
     Duration count = controller.duration! * controller.value;
@@ -31,13 +33,61 @@ class _CountdownPageState extends State<CountdownPage>
         : '${count.inHours}:${(count.inMinutes % 60).toString().padLeft(2, '0')}:${(count.inSeconds % 60).toString().padLeft(2, '0')}';
   }
 
+  bool isDialogOpen = false;
+
   double progress = 1.0;
 
   void notify() {
-    if (countText == '0:00:00') {
+    if (countText == '0:00:00' && !isDialogOpen) {
+      isDialogOpen = true; // Set the flag to true
       FlutterRingtonePlayer.playNotification();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: StatefulBuilder(
+              builder: (BuildContext context, setState) {
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Congratulations!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Good job, you finished studying!',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 20),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          isDialogOpen = false; // Reset the flag
+                        },
+                        child: Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
     }
   }
+
+
+
+
+
 
   @override
   void initState() {
@@ -71,94 +121,143 @@ class _CountdownPageState extends State<CountdownPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xfff5fbff),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 300,
-                  height: 300,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.grey.shade300,
-                    value: progress,
-                    strokeWidth: 6,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    if (controller.isDismissed) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) => Container(
-                          height: 300,
-                          child: CupertinoTimerPicker(
-                            initialTimerDuration: controller.duration!,
-                            onTimerDurationChanged: (time) {
-                              setState(() {
-                                controller.duration = time;
-                              });
-                            },
+      extendBody: true,
+      backgroundColor: Colors.blue.shade100,
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 300,
+                                height: 300,
+                                child: CircularProgressIndicator(
+                                  backgroundColor: Colors.grey.shade300,
+                                  value: progress,
+                                  strokeWidth: 6,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  if (controller.isDismissed) {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) => Container(
+                                        height: 300,
+                                        child: CupertinoTimerPicker(
+                                          initialTimerDuration:
+                                              controller.duration!,
+                                          onTimerDurationChanged: (time) {
+                                            setState(() {
+                                              controller.duration = time;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: AnimatedBuilder(
+                                  animation: controller,
+                                  builder: (context, child) => Text(
+                                    countText,
+                                    style: TextStyle(
+                                      fontSize: 60,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    }
-                  },
-                  child: AnimatedBuilder(
-                    animation: controller,
-                    builder: (context, child) => Text(
-                      countText,
-                      style: TextStyle(
-                        fontSize: 60,
-                        fontWeight: FontWeight.bold,
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 100),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  if (controller.isAnimating) {
+                                    controller.stop();
+                                    setState(() {
+                                      isPlaying = false;
+                                    });
+                                  } else {
+                                    controller.reverse(
+                                        from: controller.value == 0
+                                            ? 1.0
+                                            : controller.value);
+                                    setState(() {
+                                      isPlaying = true;
+                                    });
+                                  }
+                                },
+                                child: RoundButton(
+                                  icon: isPlaying == true
+                                      ? Icons.pause
+                                      : Icons.play_arrow,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  controller.reset();
+                                  setState(() {
+                                    isPlaying = false;
+                                  });
+                                },
+                                child: RoundButton(
+                                  icon: Icons.stop,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
+          );
+        },
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(),
+        child: SizedBox(
+          height: 100,
+          child: FloatingNavbar(
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.blue.shade700,
+            borderRadius: 40,
+            // new line
+            onTap: (int val) {
+              setState(() {
+                _currentIndex = val;
+              });
+            },
+            currentIndex: _currentIndex,
+            unselectedItemColor: Colors.grey,
+            iconSize: 33,
+            fontSize: 15,
+            items: [
+              FloatingNavbarItem(icon: Icons.home, title: 'Home'),
+              FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
+              FloatingNavbarItem(icon: Icons.settings, title: 'Setting'),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (controller.isAnimating) {
-                      controller.stop();
-                      setState(() {
-                        isPlaying = false;
-                      });
-                    } else {
-                      controller.reverse(
-                          from: controller.value == 0 ? 1.0 : controller.value);
-                      setState(() {
-                        isPlaying = true;
-                      });
-                    }
-                  },
-                  child: RoundButton(
-                    icon: isPlaying == true ? Icons.pause : Icons.play_arrow,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    controller.reset();
-                    setState(() {
-                      isPlaying = false;
-                    });
-                  },
-                  child: RoundButton(
-                    icon: Icons.stop,
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
