@@ -1,11 +1,11 @@
+import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    title: 'deadlines page',
+    title: 'Deadlines Page',
     home: DeadlinePage(),
   ));
 }
@@ -15,10 +15,11 @@ class Deadline {
   final DateTime date;
   DeadlineStatus status;
 
-  Deadline(
-      {required this.name,
-        required this.date,
-        this.status = DeadlineStatus.NotStarted});
+  Deadline({
+    required this.name,
+    required this.date,
+    this.status = DeadlineStatus.NotStarted,
+  });
 }
 
 enum DeadlineStatus {
@@ -37,10 +38,11 @@ class DeadlinePage extends StatefulWidget {
 class _DeadlinePageState extends State<DeadlinePage> {
   int _currentIndex = 0;
   List<Deadline> deadlines = [];
+  TextEditingController deadlineNameController = TextEditingController();
 
-  void addDeadline(String name, DateTime date) {
+  void addDeadline(String deadlineName, DateTime date) {
     setState(() {
-      deadlines.add(Deadline(name: name, date: date));
+      deadlines.add(Deadline(name: deadlineName, date: date));
     });
   }
 
@@ -48,17 +50,32 @@ class _DeadlinePageState extends State<DeadlinePage> {
     return DateFormat('MMM d, y').format(dateTime);
   }
 
+  void updateStatus(int index, DeadlineStatus newStatus) {
+    setState(() {
+      deadlines[index].status = newStatus;
+    });
+  }
+
+  void deleteDeadline(int index) {
+    setState(() {
+      deadlines.removeAt(index);
+    });
+  }
+
   Widget buildDeadlineList() {
-    return ListView.builder(
+    return ListView.separated(
       itemCount: deadlines.length,
-      itemBuilder: (context, index) {
+      separatorBuilder: (BuildContext context, int index) =>
+          Divider(height: 1),
+      itemBuilder: (BuildContext context, int index) {
         final deadline = deadlines[index];
         return DeadlineWidget(
           deadline: deadline,
+          onUpdateStatus: (newStatus) {
+            updateStatus(index, newStatus);
+          },
           onDelete: () {
-            setState(() {
-              deadlines.removeAt(index);
-            });
+            deleteDeadline(index);
           },
         );
       },
@@ -68,94 +85,105 @@ class _DeadlinePageState extends State<DeadlinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBody: true,
-        backgroundColor: Colors.blue.shade100,
-        body: Padding(
-          padding: EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 50,),
-              Text(
-                'Deadlines',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      extendBody: true,
+      backgroundColor: Colors.blue.shade100,
+      body: Padding(
+        padding: EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 50,
+            ),
+            Text(
+              'Deadlines',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              SizedBox(height: 20),
-              Expanded(child: buildDeadlineList()),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-        onPressed: () {
-      showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          String deadlineName = '';
-          DateTime selectedDate = DateTime.now();
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      DateTime selectedDate = DateTime.now();
 
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return Container(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Add Deadline',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          deadlineName = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Deadline Name',
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                        ).then((value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedDate = value;
-                            });
-                          }
-                        });
-                      },
-                      child: Text('Select Date'),
-                    ),
-                    SizedBox(height: 10),
-                    Text('Selected Date: ${formatDateTime(selectedDate)}'),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        addDeadline(deadlineName, selectedDate);
-                        Navigator.pop(context);
-                      },
-                      child: Text('Add Deadline'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      );
-    },
-          child: Icon(Icons.add),
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          return Container(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Add Deadline',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 20),
+                                TextField(
+                                  controller: deadlineNameController, // Add this line
+                                  decoration: InputDecoration(
+                                    labelText: 'Deadline Name',
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime.now(),
+                                      lastDate: DateTime(2100),
+                                    ).then((value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          selectedDate = value;
+                                        });
+                                      }
+                                    });
+                                  },
+                                  child: Text('Select Date'),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  'Selected Date: ${formatDateTime(selectedDate)}',
+                                ),
+                                SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    addDeadline(
+                                      deadlineNameController.text, // Use the text from the controller
+                                      selectedDate,
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Add Deadline'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+                child: Text('Add a Deadline'),
+              ),
+            ),
+            Expanded(child: buildDeadlineList()),
+          ],
         ),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(),
         child: SizedBox(
@@ -184,126 +212,134 @@ class _DeadlinePageState extends State<DeadlinePage> {
     );
   }
 }
-class DeadlineWidget extends StatefulWidget {
+
+class DeadlineWidget extends StatelessWidget {
   final Deadline deadline;
-  final Function() onDelete;
+  final Function(DeadlineStatus) onUpdateStatus;
+  final VoidCallback onDelete;
 
   const DeadlineWidget({
     required this.deadline,
+    required this.onUpdateStatus,
     required this.onDelete,
   });
 
   @override
-  _DeadlineWidgetState createState() => _DeadlineWidgetState();
-}
-
-class _DeadlineWidgetState extends State<DeadlineWidget> {
-  void updateStatus(DeadlineStatus newStatus) {
-    setState(() {
-      widget.deadline.status = newStatus;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
+    Color statusColor;
+    switch (deadline.status) {
+      case DeadlineStatus.NotStarted:
+        statusColor = Colors.red;
+        break;
+      case DeadlineStatus.InProgress:
+        statusColor = Colors.yellow.shade700;
+        break;
+      case DeadlineStatus.Done:
+        statusColor = Colors.green;
+        break;
+    }
+
+    return Container(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(16),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: <Widget>[
-                Text(
-                  widget.deadline.name,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 23,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        deadline.name.isEmpty ? 'No Name' : deadline.name,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: onDelete,
+                        icon: Icon(Icons.close),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Colors.grey,
-                  size: 16,
-                ),
-                SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Date: ${formatDateTime(widget.deadline.date)}',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14,
-                    ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        color: Colors.grey,
+                        size: 16,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Date: ${formatDateTime(deadline.date)}',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: Colors.grey,
-                  size: 16,
-                ),
-                SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Status: ${getStatusText(widget.deadline.status)}',
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14,
-                    ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Colors.grey,
+                        size: 16,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Status:',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      DropdownButton<DeadlineStatus>(
+                        value: deadline.status,
+                        onChanged: (DeadlineStatus? newValue) {
+                          if (newValue != null) {
+                            onUpdateStatus(newValue);
+                          }
+                        },
+                        items: DeadlineStatus.values.map<DropdownMenuItem<DeadlineStatus>>((DeadlineStatus value) {
+                          return DropdownMenuItem<DeadlineStatus>(
+                            value: value,
+                            child: Text(getStatusText(value)),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButton<DeadlineStatus>(
-              value: widget.deadline.status,
-              onChanged: (newValue) {
-                updateStatus(newValue!);
-              },
-              items: DeadlineStatus.values.map((status) {
-                return DropdownMenuItem<DeadlineStatus>(
-                  value: status,
-                  child: Text(
-                    getStatusText(status),
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 14,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: widget.onDelete,
-              color: Colors.red,
-            ),
-          ],
-        ),
-        onTap: () {
-          // TODO: Implement the onTap behavior if needed
-        },
-        onLongPress: () {
-          // TODO: Implement the onLongPress behavior if needed
-        },
+          ),
+        ],
       ),
     );
+  }
+
+  String formatDateTime(DateTime dateTime) {
+    return DateFormat('MMM d, y').format(dateTime);
   }
 
   String getStatusText(DeadlineStatus status) {
@@ -320,12 +356,3 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
   }
 }
 
-
-
-
-
-
-String formatDateTime(DateTime dateTime) {
-  final formatter = DateFormat('yyyy-MM-dd HH:mm');
-  return formatter.format(dateTime);
-}
