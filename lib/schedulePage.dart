@@ -1,6 +1,8 @@
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import './main.dart';
+import 'homeMenu.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -196,6 +198,12 @@ class _DeadlinePageState extends State<DeadlinePage> {
               setState(() {
                 _currentIndex = val;
               });
+              if (_currentIndex == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeMenu()),
+                );
+              }
             },
             currentIndex: _currentIndex,
             unselectedItemColor: Colors.grey,
@@ -299,20 +307,13 @@ class DeadlineWidget extends StatelessWidget {
                   SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: Colors.grey,
-                        size: 16,
-                      ),
-                      SizedBox(width: 4),
                       Text(
-                        'Status:',
+                        'Status: ',
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: Colors.grey,
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(width: 4),
                       DropdownButton<DeadlineStatus>(
                         value: deadline.status,
                         onChanged: (DeadlineStatus? newValue) {
@@ -320,15 +321,24 @@ class DeadlineWidget extends StatelessWidget {
                             onUpdateStatus(newValue);
                           }
                         },
-                        items: DeadlineStatus.values.map<DropdownMenuItem<DeadlineStatus>>((DeadlineStatus value) {
-                          return DropdownMenuItem<DeadlineStatus>(
-                            value: value,
-                            child: Text(getStatusText(value)),
-                          );
-                        }).toList(),
+                        items: [
+                          DropdownMenuItem(
+                            value: DeadlineStatus.NotStarted,
+                            child: Text('Not Started'),
+                          ),
+                          DropdownMenuItem(
+                            value: DeadlineStatus.InProgress,
+                            child: Text('In Progress'),
+                          ),
+                          DropdownMenuItem(
+                            value: DeadlineStatus.Done,
+                            child: Text('Done'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+
                 ],
               ),
             ),
@@ -336,9 +346,11 @@ class DeadlineWidget extends StatelessWidget {
         ],
       ),
     );
-  }
 
-  String formatDateTime(DateTime dateTime) {
+}
+
+
+String formatDateTime(DateTime dateTime) {
     return DateFormat('MMM d, y').format(dateTime);
   }
 
