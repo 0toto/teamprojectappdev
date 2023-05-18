@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 
 // import './main.dart';
+import './settingPage.dart';
+import './homeMenu.dart';
+import './profilePage.dart';
+import './QuizPage.dart';
 
 void main() {
   runApp(setting());
@@ -15,7 +19,26 @@ class setting extends StatefulWidget {
 }
 
 class _settingState extends State<setting> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
+
+  void _onItemTapped(int index){
+    setState(() {
+      _currentIndex = index;
+    });
+    if(_currentIndex == 0){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => HomeMenu())
+      );
+    }else if(_currentIndex == 1){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => QuizPage())
+      );
+    }else if(_currentIndex == 2){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => profile()));
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +56,15 @@ class _settingState extends State<setting> {
                 selectedItemColor: Colors.blue.shade700,
                 // new line
                 borderRadius: 40,
-                onTap: (int val) {
-                  setState(() {
-                    _currentIndex = val;
-                  });
-                },
+                onTap: _onItemTapped,
                 currentIndex: _currentIndex,
                 unselectedItemColor: Colors.grey,
                 iconSize: 33,
                 fontSize: 15,
                 items: [
                   FloatingNavbarItem(icon: Icons.home, title: 'Home'),
+                  FloatingNavbarItem(icon: Icons.menu_book, title: 'Quiz'),
                   FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
-                  FloatingNavbarItem(icon: Icons.settings, title: 'Setting'),
                 ],
               ),
             )),
@@ -71,7 +90,10 @@ class _settingState extends State<setting> {
                         child: IconButton(
                           icon: Icon(Icons.arrow_back_ios),
                           onPressed:
-                              () {}, // to add the go back to the profile settings
+                              () {
+                                Navigator.push(
+                                    context, MaterialPageRoute(builder: (context) => profile()));
+                              }, // to add the go back to the profile settings
                         ),
                       ),
                       SizedBox(

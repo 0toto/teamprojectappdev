@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
+import 'package:learnmate_project/QuizPage.dart';
 import './settingPage.dart';
+import './QuizPage.dart';
+import './profilePage.dart';
 
 void main(){
-  runApp(HomeMenu());
+  runApp(MaterialApp(home: HomeMenu(),));
 }
 
 class HomeMenu extends StatefulWidget {
@@ -16,10 +19,28 @@ class HomeMenu extends StatefulWidget {
 class _HomeMenu extends State<HomeMenu> {
   int _currentIndex = 0;
 
+  void _onItemTapped(int index){
+    setState(() {
+      _currentIndex = index;
+    });
+    if(_currentIndex == 0){
+      Navigator.push(
+        context, MaterialPageRoute(builder: (context) => HomeMenu())
+      );
+    }else if(_currentIndex == 1){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => QuizPage())
+      );
+    }else if(_currentIndex == 2){
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => profile()));
+  }
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+      return  Scaffold(
         // start of the  bar
         extendBody: true,
         bottomNavigationBar: Container(
@@ -33,11 +54,7 @@ class _HomeMenu extends State<HomeMenu> {
 
                 selectedItemColor: Colors.blue.shade700, // new line
                 borderRadius: 40,
-                onTap: (int val) {
-                  setState(() {
-                    _currentIndex = val;
-                  });
-                },
+                onTap: _onItemTapped,
                 currentIndex: _currentIndex,
                 unselectedItemColor: Colors.grey,
                 iconSize: 33,
@@ -87,7 +104,10 @@ class _HomeMenu extends State<HomeMenu> {
                             borderRadius: BorderRadius.circular(20),
                           )
                       ),
-                      onPressed: (){},
+                      onPressed: (){
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => setting()));
+                      },
                       child: Center(
                         child: Column(
                           children: [
@@ -119,7 +139,10 @@ class _HomeMenu extends State<HomeMenu> {
                             borderRadius: BorderRadius.circular(20),
                           )
                       ),
-                      onPressed: (){},
+                      onPressed: (){
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (context) => QuizPage()));
+                      },
                       child: Center(
                         child: Column(
                           children: [
@@ -294,7 +317,6 @@ class _HomeMenu extends State<HomeMenu> {
             ],
           ),
         ),
-      ),
     );
   }
 }
