@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:learnmate_project/profilePage.dart';
+import 'package:learnmate_project/quizPage.dart';
 import './settingPage.dart';
 import './timerPage.dart';
 import './schedulePage.dart';
@@ -107,7 +108,12 @@ class _HomeMenu extends State<HomeMenu> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => quiz()),
+                          );
+                        },
                         child: Center(
                           child: Column(
                             children: [
@@ -140,7 +146,12 @@ class _HomeMenu extends State<HomeMenu> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => quiz()),
+                          );
+                        },
                         child: Center(
                           child: Column(
                             children: [
