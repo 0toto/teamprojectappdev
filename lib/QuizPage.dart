@@ -1,179 +1,212 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 import './QuizObject.dart';
 import './database_helper.dart';
 
-class CreateQuizPage extends StatefulWidget {
+import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
+import './profilePage.dart';
+import './homeMenu.dart';
+import './flashcardpage.dart';
+
+class QuizPage extends StatefulWidget {
+  final Quiz quiz;
+
+  const QuizPage({Key? key, required this.quiz}) : super(key: key);
+
   @override
-  _CreateQuizPageState createState() => _CreateQuizPageState();
+  _QuizPageState createState() => _QuizPageState();
 }
 
-class _CreateQuizPageState extends State<CreateQuizPage> {
-  late List<QandA> questions;
-  late TextEditingController quizNameController;
-  late TextEditingController questionController;
+class _QuizPageState extends State<QuizPage> {
+  int _currentIndex = 0;
+
+  void _onItemTapped(int index, BuildContext context) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    if (_currentIndex == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeMenu()),
+      );
+    } else if (_currentIndex == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) =>  CreateQuizPage()),
+      );
+    } else if (_currentIndex == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => profile()),
+      );
+    }
+  }
+
+  late List<Quiz> quizzes = []; // Initialize with an empty list
+  int currentQuizIndex = 0;
+  int currentQuestionIndex = 0;
+  TextEditingController answerController = TextEditingController();
+
+  late Quiz currentQuiz;
+  late QandA currentQuestion;
   late TextEditingController answerController;
+  int currentQuestionIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    questions = [];
-    quizNameController = TextEditingController();
-    questionController = TextEditingController();
+    currentQuiz = widget.quiz;
+    currentQuestion = currentQuiz.qandAs[currentQuestionIndex];
     answerController = TextEditingController();
   }
 
-  @override
-  void dispose() {
-    quizNameController.dispose();
-    questionController.dispose();
-    answerController.dispose();
-    super.dispose();
+  void loadQuizzes() async {
+    quizzes = await DataBaseHelper().getAllQuizzes();
+    setState(() {
+      currentQuizIndex = 0;
+      currentQuestionIndex = 0;
+      answerController.clear();
+    });
   }
 
-  void addQuestion() {
-    String questionText = questionController.text.trim();
-    String answerText = answerController.text.trim();
-    if (questionText.isNotEmpty && answerText.isNotEmpty) {
-      QandA question = QandA(
-        id: questions.length + 1,
-        quizId: 0, // quizId can be set later when saving the quiz
-        question: questionText,
-        answer: answerText,
-      );
-      setState(() {
-        questions.add(question);
-        questionController.clear();
+  void goToNextQuestion() {
+    setState(() {
+      if (currentQuestionIndex < quizzes[currentQuizIndex].qandAs.length - 1) {
+        currentQuestionIndex++;
         answerController.clear();
-      });
-    }
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Quiz Completed'),
+              content: Text('You have completed the quiz.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        // You can choose to navigate to another page or perform any other action here
+      }
+    });
   }
 
-  void saveQuiz() async {
-    String quizName = quizNameController.text.trim();
-    if (quizName.isNotEmpty && questions.isNotEmpty) {
-      Quiz quiz = Quiz(
-        id: 0, // id can be set later when saving to database
-        name: quizName,
-        qandAs: questions,
-      );
-      // Insert the quiz and questions into the database
-      int quizId = await DataBaseHelper().insertQuiz(quiz);
-      quiz.id = quizId;
-      quiz.qandAs.forEach((qandA) {
-        qandA.quizId = quizId;
-        DataBaseHelper().insertQandA(qandA, quiz);
-      });
-
-      // Show a confirmation dialog
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Quiz Saved'),
-            content: Text('Quiz has been saved successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-
-      // Clear the form
-      setState(() {
-        quizNameController.clear();
-        questions.clear();
-      });
-    }
+  void checkAnswer() {
+    String userAnswer = answerController.text.trim();
+    String correctAnswer =
+        quizzes[currentQuizIndex].qandAs[currentQuestionIndex].answer;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Answer Result'),
+          content: Text(
+            userAnswer == correctAnswer ? 'Correct!' : 'Incorrect!',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                goToNextQuestion();
+              },
+              child: Text('Next Question'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (quizzes.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Quiz Page'),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    Quiz currentQuiz = quizzes[currentQuizIndex];
+    QandA currentQuestion = currentQuiz.qandAs[currentQuestionIndex];
+
+
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Quiz'),
-      ),
+
+
+      backgroundColor: Colors.blue.shade100,
+
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Quiz Name:',
+              'Quiz: ${currentQuiz.name}',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextField(
-              controller: quizNameController,
-              decoration: InputDecoration(
-                hintText: 'Enter quiz name',
               ),
             ),
             SizedBox(height: 16),
             Text(
-              'Questions:',
+              'Question ${currentQuestionIndex + 1}: ${currentQuestion.question}',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: questions.length,
-                itemBuilder: (context, index) {
-                  QandA question = questions[index];
-                  return ListTile(
-                    title: Text(
-                      'Question ${index + 1}: ${question.question}',
-                    ),
-                    subtitle: Text('Answer: ${question.answer}'),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Add Question:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextField(
-              controller: questionController,
-              decoration: InputDecoration(
-                hintText: 'Enter question',
-              ),
-            ),
-            TextField(
-              controller: answerController,
-              decoration: InputDecoration(
-                hintText: 'Enter answer',
               ),
             ),
             SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: addQuestion,
-              child: Text('Add'),
+            TextField(
+              controller: answerController,
+              decoration: InputDecoration(
+                hintText: 'Enter your answer',
+              ),
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: saveQuiz,
-              child: Text('Save Quiz'),
+              onPressed: checkAnswer,
+              child: Text('Check Answer'),
             ),
           ],
         ),
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue.shade100,
+        ),
+        child: SizedBox(
+          height: 100,
+          child: FloatingNavbar(
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.blue.shade700,
+            borderRadius: 40,
+            onTap: (index) => _onItemTapped(index, context),
+            currentIndex: _currentIndex,
+            unselectedItemColor: Colors.grey,
+            iconSize: 33,
+            fontSize: 15,
+            items: [
+              FloatingNavbarItem(icon: Icons.home, title: 'Home'),
+              FloatingNavbarItem(icon: Icons.menu_book, title: 'Quiz'),
+              FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
+            ],
+          ),
+        ),
+      ),
+
+
     );
   }
 }

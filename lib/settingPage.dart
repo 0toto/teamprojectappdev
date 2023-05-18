@@ -6,6 +6,7 @@ import './settingPage.dart';
 import './homeMenu.dart';
 import './profilePage.dart';
 import './QuizPage.dart';
+import './flashcardpage.dart';
 
 void main() {
   runApp(setting());
@@ -31,7 +32,7 @@ class _settingState extends State<setting> {
       );
     }else if(_currentIndex == 1){
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => QuizPage())
+          context, MaterialPageRoute(builder: (context) => CreateQuizPage())
       );
     }else if(_currentIndex == 2){
       Navigator.push(

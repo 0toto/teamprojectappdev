@@ -3,6 +3,7 @@ import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.da
 import './homeMenu.dart';
 import './QuizPage.dart';
 import './settingPage.dart';
+import './flashcardpage.dart';
 
 
 
@@ -26,7 +27,7 @@ class _profileState extends State<profile> {
       );
     }else if(_currentIndex == 1){
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => QuizPage())
+          context, MaterialPageRoute(builder: (context) => CreateQuizPage())
       );
     }else if(_currentIndex == 2){
       Navigator.push(

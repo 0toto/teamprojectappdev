@@ -4,7 +4,7 @@ import 'package:learnmate_project/QuizPage.dart';
 import './settingPage.dart';
 import './QuizPage.dart';
 import './profilePage.dart';
-
+import './flashcardpage.dart';
 void main(){
   runApp(MaterialApp(home: HomeMenu(),));
 }
@@ -29,7 +29,7 @@ class _HomeMenu extends State<HomeMenu> {
       );
     }else if(_currentIndex == 1){
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => QuizPage())
+          context, MaterialPageRoute(builder: (context) => CreateQuizPage())
       );
     }else if(_currentIndex == 2){
         Navigator.push(
@@ -106,7 +106,7 @@ class _HomeMenu extends State<HomeMenu> {
                       ),
                       onPressed: (){
                         Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => setting()));
+                            context, MaterialPageRoute(builder: (context) => QuizPage()));
                       },
                       child: Center(
                         child: Column(
@@ -141,7 +141,7 @@ class _HomeMenu extends State<HomeMenu> {
                       ),
                       onPressed: (){
                         Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => QuizPage()));
+                            context, MaterialPageRoute(builder: (context) => CreateQuizPage()));
                       },
                       child: Center(
                         child: Column(
