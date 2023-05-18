@@ -107,7 +107,7 @@ class _HomeMenu extends State<HomeMenu> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => TestYourselfPage()),
+                            MaterialPageRoute(builder: (context) => QuizPage()),
                           );
                         },
                         child: Center(
@@ -145,7 +145,7 @@ class _HomeMenu extends State<HomeMenu> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => QuizPage()),
+                            MaterialPageRoute(builder: (context) => TestYourselfPage()),
                           );
                         },
                         child: Center(

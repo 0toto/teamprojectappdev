@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import 'homeMenu.dart';
 import './profilePage.dart';
 import './settingPage.dart';
+import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:learnmate_project/profilePage.dart';
+import 'package:learnmate_project/settingPage.dart';
+import './main.dart';
+import 'homeMenu.dart';
 
 void main() {
   runApp(MaterialApp(
