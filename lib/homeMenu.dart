@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
+import 'package:learnmate_project/profilePage.dart';
 import './settingPage.dart';
 import './timerPage.dart';
 import './schedulePage.dart';
@@ -39,6 +40,24 @@ class _HomeMenu extends State<HomeMenu> {
                 setState(() {
                   _currentIndex = val;
                 });
+                if (_currentIndex == 0) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeMenu()),
+                  );
+                }
+                if (_currentIndex == 1) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => profile()),
+                  );
+                }
+                if (_currentIndex == 2) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => setting()),
+                  );
+                }
               },
               currentIndex: _currentIndex,
               unselectedItemColor: Colors.grey,
@@ -46,8 +65,8 @@ class _HomeMenu extends State<HomeMenu> {
               fontSize: 15,
               items: [
                 FloatingNavbarItem(icon: Icons.home, title: 'Home'),
-                FloatingNavbarItem(icon: Icons.menu_book, title: 'Quiz'),
                 FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
+                FloatingNavbarItem(icon: Icons.settings, title: 'Setting'),
               ],
             ),
           ),
@@ -198,7 +217,12 @@ class _HomeMenu extends State<HomeMenu> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CountdownPage()),
+                          );
+                        },
                         child: Center(
                           child: Column(
                             children: [
@@ -227,78 +251,6 @@ class _HomeMenu extends State<HomeMenu> {
               ),
               //------------------------------------------------
               //end of second row
-              Container(
-                padding: EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        onPressed: () {},
-                        child: Center(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 30,),
-                              Icon(
-                                Icons.lightbulb_outline_rounded,
-                                size: 90,
-                                color: Colors.blue.shade200,
-                              ),
-                              SizedBox(height: 10,),
-                              Text(
-                                'FLASHCARDS',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.blue.shade200,
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 15,),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        onPressed: () {},
-                        child: Center(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 30,),
-                              Icon(
-                                Icons.menu_book,
-                                size: 90,
-                                color: Colors.blue.shade200,
-                              ),
-                              SizedBox(height: 10,),
-                              Text(
-                                'QUIZ',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.blue.shade200,
-                                ),
-                              ),
-                              SizedBox(height: 10,),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),

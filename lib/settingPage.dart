@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 
 // import './main.dart';
+import './settingPage.dart';
+import './homeMenu.dart';
+import './profilePage.dart';
+import 'signUpPage.dart';
 
 void main() {
   runApp(setting());
@@ -15,7 +19,26 @@ class setting extends StatefulWidget {
 }
 
 class _settingState extends State<setting> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
+
+  void _onItemTapped(int index){
+    setState(() {
+      _currentIndex = index;
+    });
+    if(_currentIndex == 0){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => HomeMenu())
+      );
+    }else if(_currentIndex == 1){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => profile())
+      );
+    }else if(_currentIndex == 2){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => profile()));
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +56,7 @@ class _settingState extends State<setting> {
                 selectedItemColor: Colors.blue.shade700,
                 // new line
                 borderRadius: 40,
-                onTap: (int val) {
-                  setState(() {
-                    _currentIndex = val;
-                  });
-                },
+                onTap: _onItemTapped,
                 currentIndex: _currentIndex,
                 unselectedItemColor: Colors.grey,
                 iconSize: 33,
@@ -64,12 +83,75 @@ class _settingState extends State<setting> {
                     height: 60,
                   ),
 
+                  Row(
+                    children: [
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          onPressed:
+                              () {
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => HomeMenu()));
+                          }, // to add the go back to the profile settings
+                        ),
+                      ),
+                      SizedBox(
+                        width: 85,
+                      ),
+                      Container(
+                          child: Text(
+                            'Settings',
+                            style: TextStyle(fontSize: 20),
+                          ))
+                    ],
+                  ),
 
-        ]),
+                  SizedBox(
+                    height: 20,
+                  ),
+
+                  //notifation
+                  Container(
+                    width: double.infinity,
+                    // This will make the container take up the full width of the screen
+                    height: 40,
+                    // Set the height to 40
+                    child: MaterialButton(
+                        onPressed: () {
+                          // Add your button logic here
+                        },
+                        child: _buildOneRow(
+                            Icons.settings_power, "Learnmate v0.1")),
+                  ),
+
+                  Divider(
+                    thickness: 2, // Set the thickness of the line
+                    color: Colors.grey, // Set the color of the line
+                  ),
+
+                  //time spend
+                  Container(
+                    width: double.infinity,
+                    height: 40,
+                    child: MaterialButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SignUpPage()));
+
+                      },
+                      child: _buildOneRow(Icons.logout, "Log Out"),
+                    ),
+                  ),
+
+
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-    ),
-    )
-    )
     );
   }
 }

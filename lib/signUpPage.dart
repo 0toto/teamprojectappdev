@@ -22,6 +22,12 @@ class _SignUpPageState extends State<SignUpPage> {
     _dbHelper.init();
   }
 
+  bool isPasswordValid(String password) {
+    // Add your password validation logic here
+    // For example, a valid password should have at least 8 characters
+    return password.length >= 8;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,39 +54,42 @@ class _SignUpPageState extends State<SignUpPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                        padding: EdgeInsets.only(top: 15, left: 35, right: 35),
-                        child: TextFormField(
-                          controller: _nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Name',
-                            fillColor: Colors.white,
-                            filled: true,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your name';
-                            }
-                            return null;
-                          },
+                      padding: EdgeInsets.only(top: 15, left: 35, right: 35),
+                      child: TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Name',
+                          fillColor: Colors.white,
+                          filled: true,
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     Container(
-                        padding: EdgeInsets.only(top: 15, left: 35, right: 35),
-                        child:TextFormField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            fillColor: Colors.white,
-                            filled: true,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a password';
-                            }
-                            return null;
-                          },
+                      padding: EdgeInsets.only(top: 15, left: 35, right: 35),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          fillColor: Colors.white,
+                          filled: true,
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a password';
+                          }
+                          if (!isPasswordValid(value)) {
+                            return 'Password should have at least 8 characters';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     Container(
                       padding: EdgeInsets.only(left: 35),
@@ -99,40 +108,43 @@ class _SignUpPageState extends State<SignUpPage> {
                                     DataBaseHelper.columnPassword: password,
                                   };
                                   await _dbHelper.insert(row);
-                                  Navigator.pop(context);
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => LoginPage()),
+                                  );
                                 }
                               },
                               child: const Text('Sign Up', style: TextStyle(color: Colors.grey),),
                               style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.white),),
                             ),
-                            ),
+                          ),
                         ],
                       ),
-
                     ),
-                    Padding(padding: EdgeInsets.only(left: 35),
+                    Padding(
+                      padding: EdgeInsets.only(left: 35),
                       child: Row(
                         children: <Widget>[
                           Text('Already have an account?'),
                           TextButton(
                             onPressed: () async {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginPage()));
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => LoginPage()),
+                              );
                             },
                             child: const Text('Log In', style: TextStyle(color: Colors.white),),
                           ),
                         ],
                       ),
                     ),
-
                   ],
                 ),
               ),
             ],
-          )
+          ),
         ),
-      )
+      ),
     );
   }
 }

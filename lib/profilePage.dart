@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
+import 'package:learnmate_project/settingPage.dart';
+
+import 'homeMenu.dart';
 
 void main() {
   runApp(profile());
@@ -34,6 +37,24 @@ class _profileState extends State<profile> {
                   setState(() {
                     _currentIndex = val;
                   });
+                  if (_currentIndex == 0) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeMenu()),
+                    );
+                  }
+                  if (_currentIndex == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => profile()),
+                    );
+                  }
+                  if (_currentIndex == 2) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => setting()),
+                    );
+                  }
                 },
                 currentIndex: _currentIndex,
                 unselectedItemColor: Colors.grey,

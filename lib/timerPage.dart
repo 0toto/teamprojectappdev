@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:learnmate_project/profilePage.dart';
+import 'package:learnmate_project/settingPage.dart';
 import '../widgets/round-button.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
+
+import 'homeMenu.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -246,6 +250,24 @@ class _CountdownPageState extends State<CountdownPage>
               setState(() {
                 _currentIndex = val;
               });
+              if (_currentIndex == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeMenu()),
+                );
+              }
+              if (_currentIndex == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => profile()),
+                );
+              }
+              if (_currentIndex == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => setting()),
+                );
+              }
             },
             currentIndex: _currentIndex,
             unselectedItemColor: Colors.grey,

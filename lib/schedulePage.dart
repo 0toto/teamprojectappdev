@@ -1,6 +1,8 @@
 import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:learnmate_project/profilePage.dart';
+import 'package:learnmate_project/settingPage.dart';
 import './main.dart';
 import 'homeMenu.dart';
 
@@ -202,6 +204,18 @@ class _DeadlinePageState extends State<DeadlinePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => HomeMenu()),
+                );
+              }
+              if (_currentIndex == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => profile()),
+                );
+              }
+              if (_currentIndex == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => setting()),
                 );
               }
             },
