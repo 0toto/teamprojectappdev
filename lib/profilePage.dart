@@ -92,12 +92,12 @@ class _profileState extends State<profile> {
                           //     ),
                           //     fit: BoxFit.fill)
 
-                        color: Colors.red
+                        color: Colors.blue
                       ),
                   ),
 
 
-                  
+
                   Container(
                     height: 50,
                     alignment: Alignment.bottomCenter,
@@ -113,7 +113,11 @@ class _profileState extends State<profile> {
                     alignment: Alignment.bottomRight,
                     child: IconButton(
                       icon: Icon(Icons.settings) ,
-                      onPressed: (){},
+                      onPressed: (){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => setting()));
+                      },
                     ),
                   ),
 
@@ -149,7 +153,7 @@ class _profileState extends State<profile> {
                   Text('Email')
                 ],
               ),
-              
+
               Padding(padding: EdgeInsets.all(10),
               child: Text(
                 'usernam123@gmail.com'

@@ -12,6 +12,7 @@ void main(){
 }
 
 class HomeMenu extends StatefulWidget {
+
   const HomeMenu({Key? key}) : super(key: key);
 
   @override
@@ -24,6 +25,7 @@ class _HomeMenu extends State<HomeMenu> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         extendBody: true,
         bottomNavigationBar: Container(
