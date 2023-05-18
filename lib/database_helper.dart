@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 class DataBaseHelper {
   static const _databaseName = "myDatabase2.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
 
   static const table = "My_Table";
   static const columnId = "_id";
