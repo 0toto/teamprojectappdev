@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'homeMenu.dart';
 import './profilePage.dart';
 import './settingPage.dart';
+import "./database_helper.dart";
 
 void main() {
   runApp(MaterialApp(
@@ -16,11 +17,13 @@ void main() {
 class Deadline {
   final String name;
   final DateTime date;
+  final String user;
   DeadlineStatus status;
 
   Deadline({
     required this.name,
     required this.date,
+    required this.user,
     this.status = DeadlineStatus.NotStarted,
   });
 }
@@ -40,12 +43,17 @@ class DeadlinePage extends StatefulWidget {
 
 class _DeadlinePageState extends State<DeadlinePage> {
   int _currentIndex = 0;
-  List<Deadline> deadlines = [];
+  static List<Deadline> deadlines = [];
   TextEditingController deadlineNameController = TextEditingController();
-
   void addDeadline(String deadlineName, DateTime date) {
     setState(() {
-      deadlines.add(Deadline(name: deadlineName, date: date));
+      deadlines.add(
+          Deadline(
+              name: deadlineName,
+              date: date,
+              user: DataBaseHelper.getCurrentUser()[DataBaseHelper.columnName]
+          )
+      );
     });
   }
 
@@ -66,12 +74,14 @@ class _DeadlinePageState extends State<DeadlinePage> {
   }
 
   Widget buildDeadlineList() {
+    var currentUser = DataBaseHelper.getCurrentUser()[DataBaseHelper.columnName];
+    var _deadlines = deadlines.where((s) => s.user == currentUser).toList();
     return ListView.separated(
-      itemCount: deadlines.length,
+      itemCount: _deadlines.length,
       separatorBuilder: (BuildContext context, int index) =>
           Divider(height: 1),
       itemBuilder: (BuildContext context, int index) {
-        final deadline = deadlines[index];
+        final deadline = _deadlines[index];
         return DeadlineWidget(
           deadline: deadline,
           onUpdateStatus: (newStatus) {
