@@ -5,7 +5,7 @@ import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.da
 import './settingPage.dart';
 import './homeMenu.dart';
 import './profilePage.dart';
-import './QuizPage.dart';
+import 'signUpPage.dart';
 
 void main() {
   runApp(setting());
@@ -31,7 +31,7 @@ class _settingState extends State<setting> {
       );
     }else if(_currentIndex == 1){
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => QuizPage())
+          context, MaterialPageRoute(builder: (context) => profile())
       );
     }else if(_currentIndex == 2){
       Navigator.push(
@@ -63,8 +63,8 @@ class _settingState extends State<setting> {
                 fontSize: 15,
                 items: [
                   FloatingNavbarItem(icon: Icons.home, title: 'Home'),
-                  FloatingNavbarItem(icon: Icons.menu_book, title: 'Quiz'),
                   FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
+                  FloatingNavbarItem(icon: Icons.settings, title: 'Setting'),
                 ],
               ),
             )),
@@ -91,9 +91,9 @@ class _settingState extends State<setting> {
                           icon: Icon(Icons.arrow_back_ios),
                           onPressed:
                               () {
-                                Navigator.push(
-                                    context, MaterialPageRoute(builder: (context) => profile()));
-                              }, // to add the go back to the profile settings
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => HomeMenu()));
+                          }, // to add the go back to the profile settings
                         ),
                       ),
                       SizedBox(
@@ -101,9 +101,9 @@ class _settingState extends State<setting> {
                       ),
                       Container(
                           child: Text(
-                        'Settings',
-                        style: TextStyle(fontSize: 20),
-                      ))
+                            'Settings',
+                            style: TextStyle(fontSize: 20),
+                          ))
                     ],
                   ),
 
@@ -122,7 +122,7 @@ class _settingState extends State<setting> {
                           // Add your button logic here
                         },
                         child: _buildOneRow(
-                            Icons.notifications_none_sharp, "Notifications")),
+                            Icons.settings_power, "Learnmate v0.1")),
                   ),
 
                   Divider(
@@ -133,77 +133,19 @@ class _settingState extends State<setting> {
                   //time spend
                   Container(
                     width: double.infinity,
-                    // This will make the container take up  the full width of the screen
                     height: 40,
-                    // Set the height to 40
                     child: MaterialButton(
-                        onPressed: () {
-                          // Add your button logic here
-                        },
-                        child:
-                            _buildOneRow(Icons.timer_outlined, "Time Spend")),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SignUpPage()));
+
+                      },
+                      child: _buildOneRow(Icons.logout, "Log Out"),
+                    ),
                   ),
 
-                  Divider(
-                    thickness: 2, // Set the thickness of the line
-                    color: Colors.grey, // Set the color of the line
-                  ),
 
-                  //email Notification
-                  Container(
-                    width: double.infinity,
-                    // This will make the container take up  the full width of the screen
-                    height: 40,
-                    // Set the height to 40
-                    child: MaterialButton(
-                        onPressed: () {
-                          // Add your button logic here
-                        },
-                        child: _buildOneRow(
-                            Icons.email_outlined, "Email Notification")),
-                  ),
-
-                  Divider(
-                    thickness: 2, // Set the thickness of the line
-                    color: Colors.grey, // Set the color of the line
-                  ),
-
-                  //privacy
-                  Container(
-                    width: double.infinity,
-                    // This will make the container take up  the full width of the screen
-                    height: 40,
-                    // Set the height to 40
-                    child: MaterialButton(
-                        onPressed: () {
-                          // Add your button logic here
-                        },
-                        child: _buildOneRow(Icons.privacy_tip_outlined,
-                            "Privacy Notification ")),
-                  ),
-
-                  Divider(
-                    thickness: 2, // Set the thickness of the line
-                    color: Colors.grey, // Set the color of the line
-                  ),
-
-                  //log out
-                  Container(
-                    width: double.infinity,
-                    // This will make the container take up  the full width of the screen
-                    height: 40,
-                    // Set the height to 40
-                    child: MaterialButton(
-                        onPressed: () {
-                          // Add your button logic here
-                        },
-                        child: _buildOneRow(Icons.logout, "Log Out")),
-                  ),
-
-                  Divider(
-                    thickness: 2, // Set the thickness of the line
-                    color: Colors.grey, // Set the color of the line
-                  ),
                 ],
               ),
             ),

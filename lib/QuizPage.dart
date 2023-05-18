@@ -1,97 +1,78 @@
+import 'package:floating_bottom_navigation_bar/floating_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
-import './QuizObject.dart';
-import './database_helper.dart';
+import 'database_helper.dart';
+import './model.dart';
+import './homeMenu.dart';
+import './profilePage.dart';
+import './settingPage.dart';
 
-class CreateQuizPage extends StatefulWidget {
+class TestYourselfPage extends StatefulWidget {
   @override
-  _CreateQuizPageState createState() => _CreateQuizPageState();
+  _TestYourselfPageState createState() => _TestYourselfPageState();
 }
 
-class _CreateQuizPageState extends State<CreateQuizPage> {
-  late List<QandA> questions;
-  late TextEditingController quizNameController;
-  late TextEditingController questionController;
-  late TextEditingController answerController;
+class _TestYourselfPageState extends State<TestYourselfPage> {
+  int _currentIndex = 0;
+
+  List<Quiz> quizzes = [];
+  List<QandA> questions = [];
+  List<bool> answerVisible = [];
+  DataBaseHelper dbHelper = DataBaseHelper();
 
   @override
   void initState() {
     super.initState();
-    questions = [];
-    quizNameController = TextEditingController();
-    questionController = TextEditingController();
-    answerController = TextEditingController();
+    initDatabase();
   }
 
-  @override
-  void dispose() {
-    quizNameController.dispose();
-    questionController.dispose();
-    answerController.dispose();
-    super.dispose();
-  }
-
-  void addQuestion() {
-    String questionText = questionController.text.trim();
-    String answerText = answerController.text.trim();
-    if (questionText.isNotEmpty && answerText.isNotEmpty) {
-      QandA question = QandA(
-        id: questions.length + 1,
-        quizId: 0, // quizId can be set later when saving the quiz
-        question: questionText,
-        answer: answerText,
-      );
-      setState(() {
-        questions.add(question);
-        questionController.clear();
-        answerController.clear();
-      });
+  Future<void> initDatabase() async {
+    try {
+      await dbHelper.init();
+      loadQuizzes();
+    } catch (e) {
+      print("Error initializing database: $e");
     }
   }
 
-  void saveQuiz() async {
-    String quizName = quizNameController.text.trim();
-    if (quizName.isNotEmpty && questions.isNotEmpty) {
-      Quiz quiz = Quiz(
-        id: 0, // id can be set later when saving to database
-        name: quizName,
-        qandAs: questions,
-      );
-      // Insert the quiz and questions into the database
-      int quizId = await DataBaseHelper().insertQuiz(quiz);
-      quiz.id = quizId;
-      quiz.qandAs.forEach((qandA) {
-        qandA.quizId = quizId;
-        DataBaseHelper().insertQandA(qandA, quiz);
+  Future<void> loadQuizzes() async {
+    try {
+      final name = DataBaseHelper.getCurrentUser()[DataBaseHelper.columnName];
+      quizzes = await dbHelper.getAllQuizzes().then((list) {
+        return list
+            .map((item) => Quiz.fromMap(item))
+            .where((quiz) => quiz.user == name)
+            .toList();
       });
+      setState(() {});
+    } catch (e) {
+      print("Error loading quizzes: $e");
+    }
+  }
 
-      // Show a confirmation dialog
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Quiz Saved'),
-            content: Text('Quiz has been saved successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-
-      // Clear the form
-      setState(() {
-        quizNameController.clear();
-        questions.clear();
+  Future<void> loadQuestions(int quizId) async {
+    try {
+      questions = await dbHelper.getQandAsForQuiz(quizId).then((list) {
+        return list.map((item) => QandA.fromMap(item)).toList();
       });
+      answerVisible = List<bool>.filled(questions.length, false);
+      setState(() {});
+    } catch (e) {
+      print("Error loading questions: $e");
+    }
+  }
+
+  void toggleAnswerVisibility(int index) {
+    setState(() {
+      answerVisible[index] = !answerVisible[index];
+    });
+  }
+
+  Future<void> deleteEverything() async {
+    try {
+      await dbHelper.deleteAllTables();
+      loadQuizzes();
+    } catch (e) {
+      print("Error deleting everything: $e");
     }
   }
 
@@ -99,80 +80,233 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Quiz'),
+        title: Text('Quizzes'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Quiz Name:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextField(
-              controller: quizNameController,
-              decoration: InputDecoration(
-                hintText: 'Enter quiz name',
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Questions:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: questions.length,
-                itemBuilder: (context, index) {
-                  QandA question = questions[index];
-                  return ListTile(
-                    title: Text(
-                      'Question ${index + 1}: ${question.question}',
-                    ),
-                    subtitle: Text('Answer: ${question.answer}'),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Add Question:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextField(
-              controller: questionController,
-              decoration: InputDecoration(
-                hintText: 'Enter question',
-              ),
-            ),
-            TextField(
-              controller: answerController,
-              decoration: InputDecoration(
-                hintText: 'Enter answer',
-              ),
-            ),
-            SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: addQuestion,
-              child: Text('Add'),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: saveQuiz,
-              child: Text('Save Quiz'),
-            ),
-          ],
+
+      extendBody: false,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue.shade100,
         ),
+        child: SizedBox(
+          height: 100,
+          child: FloatingNavbar(
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.blue.shade700,
+            borderRadius: 40,
+            onTap: (int val) {
+              setState(() {
+                _currentIndex = val;
+              });
+              if (_currentIndex == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeMenu()),
+                );
+              }
+              if (_currentIndex == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => profile()),
+                );
+              }
+              if (_currentIndex == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => setting()),
+                );
+              }
+            },
+            currentIndex: _currentIndex,
+            unselectedItemColor: Colors.grey,
+            iconSize: 33,
+            fontSize: 15,
+            items: [
+              FloatingNavbarItem(icon: Icons.home, title: 'Home'),
+              FloatingNavbarItem(icon: Icons.person, title: 'Profile'),
+              FloatingNavbarItem(icon: Icons.settings, title: 'Setting'),
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.blue.shade100,
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: quizzes.length,
+              itemBuilder: (context, index) {
+                final quiz = quizzes[index];
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        quiz.name,
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 20,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizQuestionsPage(
+                              quiz: quiz,
+                              dbHelper: dbHelper,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    Divider(
+                      thickness: 2.0,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: ListView.builder(
+              itemCount: questions.length,
+              itemBuilder: (context, index) {
+                final question = questions[index];
+                return GestureDetector(
+                  onTap: () {
+                    toggleAnswerVisibility(index);
+                  },
+                  child: Container(
+                    color: answerVisible[index] ? Colors.grey : Colors.white,
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          question.question,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Visibility(
+                          visible: answerVisible[index],
+                          child: Text(
+                            question.answer,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          ElevatedButton(
+            onPressed: deleteEverything,
+            child: Text(
+              'Delete Everything',
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class QuizQuestionsPage extends StatefulWidget {
+  final Quiz quiz;
+  final DataBaseHelper dbHelper;
+
+  QuizQuestionsPage({
+    required this.quiz,
+    required this.dbHelper,
+  });
+
+  @override
+  _QuizQuestionsPageState createState() => _QuizQuestionsPageState();
+}
+
+class _QuizQuestionsPageState extends State<QuizQuestionsPage> {
+  List<QandA> questions = [];
+  List<bool> answerVisible = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadQuestions();
+  }
+
+  Future<void> loadQuestions() async {
+    try {
+      questions = await widget.dbHelper
+          .getQandAsForQuiz(widget.quiz.id)
+          .then((list) {
+        return list.map((item) => QandA.fromMap(item)).toList();
+      });
+      answerVisible = List<bool>.filled(questions.length, false);
+      setState(() {});
+    } catch (e) {
+      print("Error loading questions: $e");
+    }
+  }
+
+  void toggleAnswerVisibility(int index) {
+    setState(() {
+      answerVisible[index] = !answerVisible[index];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.quiz.name),
+      ),
+      body: ListView.builder(
+        itemCount: questions.length,
+        itemBuilder: (context, index) {
+          final question = questions[index];
+          return GestureDetector(
+            onTap: () {
+              toggleAnswerVisibility(index);
+            },
+            child: Container(
+              color: answerVisible[index] ? Colors.grey : Colors.white,
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    question.question,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Visibility(
+                    visible: answerVisible[index],
+                    child: Text(
+                      question.answer,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "learnmate_project" "\0"
+            VALUE "FileDescription", "testingfortheprokect" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "learnmate_project" "\0"
+            VALUE "InternalName", "testingfortheprokect" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "learnmate_project.exe" "\0"
-            VALUE "ProductName", "learnmate_project" "\0"
+            VALUE "OriginalFilename", "testingfortheprokect.exe" "\0"
+            VALUE "ProductName", "testingfortheprokect" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
